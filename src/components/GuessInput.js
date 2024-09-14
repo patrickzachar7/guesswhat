@@ -5,7 +5,6 @@ import axios from 'axios';
 const InputContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: 400px;
 `;
 
 const Input = styled.input`
@@ -14,6 +13,8 @@ const Input = styled.input`
   font-size: ${({ theme }) => theme.fontSizes.medium};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.borderRadius};
+  background-color: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const SuggestionList = styled.ul`
@@ -47,7 +48,6 @@ const SuggestionImage = styled.img`
   margin-right: ${({ theme }) => theme.spacing.small};
   vertical-align: middle;
 `;
-
 function GuessInput({ onSubmit, isInfinite }) {
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -96,7 +96,6 @@ function GuessInput({ onSubmit, isInfinite }) {
     setInputValue(suggestion.title);
     setSuggestions([]);
   };
-
   return (
     <InputContainer>
       <form onSubmit={handleSubmit}>

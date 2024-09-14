@@ -13,6 +13,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.1.18",
     "axios": "^1.7.7",
+    "cookie": "^0.6.0",
     "framer-motion": "^6.3.3",
     "mongoose": "^8.6.2",
     "next": "^14.2.11",
@@ -20,7 +21,8 @@
     "react-confetti": "^6.0.1",
     "react-dom": "^18.3.1",
     "styled-components": "^5.3.5",
-    "use-sound": "^4.0.1"
+    "use-sound": "^4.0.1",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.31",

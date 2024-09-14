@@ -2,75 +2,72 @@
 
 import dbConnect from '../../utils/dbConnect';
 import Question from '../../models/Question';
-import { questions } from '../../utils/questionManager';
-
-let askedQuestions = new Set();
-
-// Reset asked questions every 24 hours
-setInterval(() => {
-  askedQuestions.clear();
-}, 24 * 60 * 60 * 1000);
+import { v4 as uuidv4 } from 'uuid'; // Import the UUID library
+import cookie from 'cookie'; // For cookie parsing and serialization
 
 export default async function handler(req, res) {
-  console.log('Attempting to connect to the database...');
   try {
     await dbConnect();
-    console.log('Successfully connected to the database');
 
-    const count = await Question.countDocuments();
-    console.log(`Number of questions in the database: ${count}`);
+    // Parse cookies from the request headers
+    const cookies = cookie.parse(req.headers.cookie || '');
 
-    if (askedQuestions.size >= count && count > 0) {
-      return res.status(200).json({ gameCompleted: true, totalQuestions: count });
+    // Generate or retrieve the user ID
+    let userId = cookies.userId || generateAnonymousUserId(res);
+
+    // Retrieve user's asked question IDs from cookies
+    let askedQuestionIds = cookies.askedQuestionIds ? JSON.parse(cookies.askedQuestionIds) : [];
+
+    // Check if all questions have been asked
+    const totalQuestions = await Question.countDocuments();
+
+    if (askedQuestionIds.length >= totalQuestions) {
+      return res.status(200).json({ gameCompleted: true, totalQuestions });
     }
 
-    let randomQuestion;
-    let attempts = 0;
-    const maxAttempts = count > 0 ? count * 2 : 10; // Avoid infinite loop
-
-    do {
-      attempts++;
-      if (count === 0) {
-        console.log('No questions in the database, using questionManager');
-        const categories = Object.keys(questions);
-        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-        const categoryQuestions = questions[randomCategory];
-        const randomIndex = Math.floor(Math.random() * categoryQuestions.length);
-        const selectedQuestion = categoryQuestions[randomIndex];
-
-        randomQuestion = {
-          _id: selectedQuestion.id,
-          hints: selectedQuestion.hints,
-          category: randomCategory,
-          difficulty: selectedQuestion.difficulty || 'medium',
-        };
-      } else {
-        const random = Math.floor(Math.random() * count);
-        const candidateQuestion = await Question.findOne().skip(random).lean();
-        if (!askedQuestions.has(candidateQuestion._id.toString())) {
-          randomQuestion = candidateQuestion;
-        }
-      }
-    } while (!randomQuestion && attempts < maxAttempts);
-
-    if (attempts >= maxAttempts) {
-      return res.status(200).json({ gameCompleted: true, totalQuestions: count });
-    }
+    // Fetch a random question the user hasn't seen
+    const [randomQuestion] = await Question.aggregate([
+      { $match: { _id: { $nin: askedQuestionIds } } },
+      { $sample: { size: 1 } },
+      { $project: { answer: 0 } }, // Exclude the 'answer' field
+    ]);
 
     if (!randomQuestion) {
-      console.log('No random question found after maximum attempts');
-      return res.status(404).json({ error: 'No questions found' });
+      return res.status(200).json({ gameCompleted: true, totalQuestions });
     }
 
-    // Remove the 'answer' field before adding to askedQuestions and sending
-    const { answer, ...questionWithoutAnswer } = randomQuestion;
-    askedQuestions.add(randomQuestion._id.toString());
+    // Add the question ID to the user's asked questions
+    askedQuestionIds.push(randomQuestion._id);
 
-    console.log('Sending question without answer:', questionWithoutAnswer);
+    // Serialize cookies
+    res.setHeader('Set-Cookie', [
+      cookie.serialize('userId', userId, {
+        maxAge: 24 * 60 * 60, // 1 day in seconds
+        httpOnly: true,
+        path: '/',
+      }),
+      cookie.serialize('askedQuestionIds', JSON.stringify(askedQuestionIds), {
+        maxAge: 24 * 60 * 60, // 1 day in seconds
+        httpOnly: true,
+        path: '/',
+      }),
+    ]);
 
-    res.status(200).json(questionWithoutAnswer);
+    res.status(200).json(randomQuestion);
   } catch (error) {
     console.error('Error in random-question handler:', error);
     res.status(500).json({ error: 'Error fetching random question' });
   }
+}
+
+// Helper function to generate a user ID for anonymous users
+function generateAnonymousUserId(res) {
+  const userId = uuidv4(); // Generate a unique ID
+  // Set cookie with userId
+  res.setHeader('Set-Cookie', cookie.serialize('userId', userId, {
+    maxAge: 24 * 60 * 60, // 1 day in seconds
+    httpOnly: true,
+    path: '/',
+  }));
+  return userId;
 }
