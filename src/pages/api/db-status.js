@@ -18,7 +18,8 @@ export default async function handler(req, res) {
     res.status(200).json({ 
       status: 'Connected to database',
       connectionTime: `${connectionTime}ms`,
-      databaseStatus: dbStatusString
+      databaseStatus: dbStatusString,
+      mongoVersion: mongoose.version
     });
   } catch (error) {
     console.error('Error in db-status handler:', error);
@@ -26,7 +27,8 @@ export default async function handler(req, res) {
       status: 'Failed to connect to database',
       error: error.message,
       stack: error.stack,
-      mongodbUri: process.env.MONGODB_URI ? 'Set' : 'Not set'
+      mongodbUri: process.env.MONGODB_URI ? 'Set' : 'Not set',
+      mongoVersion: mongoose.version
     });
   }
 }
