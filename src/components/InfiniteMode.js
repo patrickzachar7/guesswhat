@@ -95,32 +95,12 @@ function InfiniteMode() {
     skipQuestion: 0,
   });
   const [error, setError] = useState(null);
-  
-  const preloadQuestions = useCallback(async () => {
-    try {
-      const response = await fetch('/api/random-question');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const newQuestion = await response.json();
-      setCachedQuestions(prev => [...prev, newQuestion]);
-    } catch (error) {
-      console.error('Error preloading question:', error);
-    }
-  }, []);
 
   const loadNextQuestion = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
-  
-      const response = await fetch('/api/random-question', {
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-  
+      const response = await fetch('/api/random-question');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -133,7 +113,7 @@ function InfiniteMode() {
     } catch (error) {
       console.error('Error fetching question:', error);
       setCurrentQuestion(null);
-      setError(error.name === 'AbortError' ? new Error('Request timed out') : error);
+      setError(error);
     } finally {
       setIsLoading(false);
     }
@@ -262,14 +242,7 @@ function InfiniteMode() {
 
   useEffect(() => {
     loadNextQuestion();
-    preloadQuestions();
-  }, [loadNextQuestion, preloadQuestions]);
-  
-  useEffect(() => {
-    if (cachedQuestions.length < 3) {
-      preloadQuestions();
-    }
-  }, [cachedQuestions, preloadQuestions]);
+  }, [loadNextQuestion]);
 
   useEffect(() => {
     if (timeLeft > 0 && !isGameOver) {
