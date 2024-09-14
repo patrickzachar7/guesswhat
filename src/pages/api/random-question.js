@@ -34,11 +34,15 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'No questions found' });
     }
 
+    console.log('Random question found:', randomQuestion);
+
     const { answer, ...questionWithoutAnswer } = randomQuestion.toObject ? randomQuestion.toObject() : randomQuestion;
+
+    console.log('Sending question without answer:', questionWithoutAnswer);
 
     res.status(200).json(questionWithoutAnswer);
   } catch (error) {
     console.error('Error in random-question handler:', error);
-    res.status(500).json({ error: 'Error fetching random question', details: error.message });
+    res.status(500).json({ error: 'Error fetching random question', details: error.message, stack: error.stack });
   }
 }

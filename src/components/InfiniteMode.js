@@ -98,15 +98,18 @@ function InfiniteMode() {
     extraLife: 0,
     skipQuestion: 0,
   });
+  const [error, setError] = useState(null);
 
   const loadNextQuestion = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const response = await fetch('/api/random-question');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const newQuestion = await response.json();
+      console.log('Received question:', newQuestion);
       setCurrentQuestion(newQuestion);
       setRevealedHints([newQuestion.hints[0]]);
       setHintIndex(1);
@@ -114,6 +117,7 @@ function InfiniteMode() {
     } catch (error) {
       console.error('Error fetching question:', error);
       setCurrentQuestion(null);
+      setError(error);
     } finally {
       setIsLoading(false);
     }
@@ -197,6 +201,7 @@ function InfiniteMode() {
       }
     } catch (error) {
       console.error('Error submitting guess:', error);
+      setError(error);
     }
   }, [currentQuestion, handleCorrectAnswer, handleIncorrectAnswer]);
 
@@ -258,11 +263,11 @@ function InfiniteMode() {
   }, [timeLeft, isGameOver, handleIncorrectAnswer]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Loading question...</div>;
   }
 
   if (!currentQuestion) {
-    return <div>Error loading question. Please try again later.</div>;
+    return <div>Error loading question. Please try again later. Details: {error ? error.message : 'Unknown error'}</div>;
   }
 
   if (isGameOver) {
@@ -308,16 +313,16 @@ function InfiniteMode() {
             <GuessInput onSubmit={handleGuess} isInfinite={true} />
           </>
         )}
-   {showResult && (
-  <ResultModal
-    isCorrect={isCorrect}
-    onNextQuestion={handleNextQuestion}
-    animationsEnabled={animationsEnabled}
-    soundsEnabled={soundsEnabled}
-    score={score}
-    achievements={achievements}
-  />
-)}
+        {showResult && (
+          <ResultModal
+            isCorrect={isCorrect}
+            onNextQuestion={handleNextQuestion}
+            animationsEnabled={animationsEnabled}
+            soundsEnabled={soundsEnabled}
+            score={score}
+            achievements={achievements}
+          />
+        )}
       </ContentWrapper>
     </InfiniteModeContainer>
   );
