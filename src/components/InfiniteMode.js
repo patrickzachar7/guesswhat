@@ -1,3 +1,5 @@
+// src/components/InfiniteMode.js
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
@@ -75,6 +77,9 @@ const INITIAL_LIVES = 3;
 const QUESTION_TIME = 30; // seconds
 
 function InfiniteMode() {
+  const [totalHintsUsed, setTotalHintsUsed] = useState(0);
+  const [totalQuestionsAnswered, setTotalQuestionsAnswered] = useState(0);
+  const [gameStartTime, setGameStartTime] = useState(Date.now());
   const [isLoading, setIsLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [revealedHints, setRevealedHints] = useState([]);
@@ -95,6 +100,7 @@ function InfiniteMode() {
     skipQuestion: 0,
   });
   const [error, setError] = useState(null);
+  const [correctAnswer, setCorrectAnswer] = useState(''); // Added state variable
 
   const loadNextQuestion = useCallback(async () => {
     setIsLoading(true);
@@ -104,12 +110,20 @@ function InfiniteMode() {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const newQuestion = await response.json();
-      console.log('Received question:', newQuestion);
-      setCurrentQuestion(newQuestion);
-      setRevealedHints([newQuestion.hints[0]]);
+      const data = await response.json();
+      console.log('Loaded question data:', data);
+      
+      if (data.gameCompleted) {
+        setIsGameOver(true);
+        setIsLoading(false);
+        return;
+      }
+      
+      setCurrentQuestion(data);
+      setRevealedHints([data.hints[0]]);
       setHintIndex(1);
       setTimeLeft(QUESTION_TIME);
+      setCorrectAnswer(''); // Reset correctAnswer for new question
     } catch (error) {
       console.error('Error fetching question:', error);
       setCurrentQuestion(null);
@@ -134,10 +148,12 @@ function InfiniteMode() {
     setCombo(0);
     setIsCorrect(false);
     setShowResult(true);
-  }, [handleGameOver]);
+    setTotalQuestionsAnswered(prev => prev + 1);
+    setTotalHintsUsed(prev => prev + hintIndex - 1);
+  }, [handleGameOver, hintIndex]);
 
   const calculatePoints = useCallback((timeLeft) => {
-    const basePoints = Math.max(10 - hintIndex, 1);
+    const basePoints = Math.max(10 - hintIndex + 1, 1);
     const timeBonus = Math.floor((timeLeft / QUESTION_TIME) * 10);
     const subtotal = basePoints + timeBonus;
     const comboMultiplier = Math.min(1 + (combo * 0.1), 2);
@@ -158,13 +174,15 @@ function InfiniteMode() {
 
     setIsCorrect(true);
     setShowResult(true);
+    setTotalQuestionsAnswered(prev => prev + 1);
+    setTotalHintsUsed(prev => prev + hintIndex - 1);
 
     console.log(`Correct answer! Earned ${pointsEarned} points. New currency: ${currency + pointsEarned}`);
-  }, [calculatePoints, timeLeft, currency, combo]);
+  }, [calculatePoints, timeLeft, currency, combo, hintIndex]);
 
   const handleGuess = useCallback(async (guess) => {
     const guessText = typeof guess === 'object' ? guess.title : guess;
-
+  
     try {
       const response = await fetch('/api/guess-check', {
         method: 'POST',
@@ -176,18 +194,23 @@ function InfiniteMode() {
           guess: guessText,
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       const data = await response.json();
-
+      console.log('Guess check response:', data);
+  
+      // Set the correct answer from the API response
+      setCorrectAnswer(data.correctAnswer);
+  
       if (data.correct) {
         handleCorrectAnswer();
       } else {
         handleIncorrectAnswer();
       }
+      setShowResult(true);
     } catch (error) {
       console.error('Error submitting guess:', error);
       setError(error);
@@ -237,6 +260,10 @@ function InfiniteMode() {
     setLives(INITIAL_LIVES);
     setCombo(0);
     setIsGameOver(false);
+    setTotalHintsUsed(0);
+    setTotalQuestionsAnswered(0);
+    setGameStartTime(Date.now());
+    setCorrectAnswer(''); // Reset correctAnswer when restarting
     loadNextQuestion();
   }, [loadNextQuestion]);
 
@@ -267,6 +294,9 @@ function InfiniteMode() {
         currency={currency}
         onRestart={restartGame}
         achievements={achievements}
+        totalHintsUsed={totalHintsUsed}
+        totalQuestionsAnswered={totalQuestionsAnswered}
+        gameStartTime={gameStartTime}
       />
     );
   }
@@ -313,6 +343,7 @@ function InfiniteMode() {
             pointsEarned={lastPointsEarned}
             totalPoints={currency}
             achievements={achievements}
+            correctAnswer={correctAnswer} // Passing the correct answer
           />
         )}
       </ContentWrapper>

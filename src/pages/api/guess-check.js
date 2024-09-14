@@ -1,3 +1,5 @@
+// src/pages/api/guess-check.js
+
 import dbConnect from '../../utils/dbConnect';
 import Question from '../../models/Question';
 
@@ -21,9 +23,11 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Question not found' });
     }
 
-    const correct = question.answer.toLowerCase().trim() === guess.toLowerCase().trim();
+    const correctAnswer = question.answer;
+    const correct = correctAnswer.toLowerCase().trim() === guess.toLowerCase().trim();
 
-    res.status(200).json({ correct });
+    // Include the correct answer in the response
+    res.status(200).json({ correct, correctAnswer });
   } catch (error) {
     console.error('Error processing guess:', error);
     res.status(500).json({ error: 'Error processing guess' });

@@ -1,3 +1,5 @@
+// src/components/ResultModal.js
+
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -56,6 +58,13 @@ const TotalScoreText = styled.p`
   font-size: ${({ theme }) => theme.fontSizes.xLarge};
   margin-bottom: ${({ theme }) => theme.spacing.medium};
   color: ${({ theme }) => theme.colors.primary};
+  font-weight: bold;
+`;
+
+const CorrectAnswerText = styled.p`
+  font-size: ${({ theme }) => theme.fontSizes.large};
+  margin-bottom: ${({ theme }) => theme.spacing.medium};
+  color: ${({ theme }) => theme.colors.text};
   font-weight: bold;
 `;
 
@@ -118,6 +127,7 @@ const ResultModal = ({
   pointsEarned,
   totalPoints,
   achievements,
+  correctAnswer,
 }) => {
   const [playCorrect] = useSound('/sounds/correct.mp3', { volume: 0.5 });
   const [playIncorrect] = useSound('/sounds/incorrect.mp3', { volume: 0.5 });
@@ -136,6 +146,8 @@ const ResultModal = ({
     shareScore(totalPoints);
   };
 
+  console.log('ResultModal props:', { isCorrect, correctAnswer, pointsEarned, totalPoints });
+
   return (
     <ModalOverlay
       initial={{ opacity: 0 }}
@@ -150,10 +162,22 @@ const ResultModal = ({
       >
         <CloseButton onClick={onNextQuestion}>&times;</CloseButton>
         <Title isCorrect={isCorrect}>{isCorrect ? 'Correct!' : 'Incorrect'}</Title>
-        {isCorrect && (
+        {isCorrect ? (
           <>
             <ScoreText>You&apos;ve gained {pointsEarned} points</ScoreText>
             <TotalScoreText>Total points: {totalPoints}</TotalScoreText>
+          </>
+        ) : (
+          <>
+            {correctAnswer ? (
+              <CorrectAnswerText>
+                The correct answer was: {correctAnswer}
+              </CorrectAnswerText>
+            ) : (
+              <CorrectAnswerText>
+                The correct answer was not available.
+              </CorrectAnswerText>
+            )}
           </>
         )}
         {achievements && achievements.length > 0 && (

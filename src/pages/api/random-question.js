@@ -1,6 +1,15 @@
+// src/pages/api/random-question.js
+
 import dbConnect from '../../utils/dbConnect';
 import Question from '../../models/Question';
 import { questions } from '../../utils/questionManager';
+
+let askedQuestions = new Set();
+
+// Reset asked questions every 24 hours
+setInterval(() => {
+  askedQuestions.clear();
+}, 24 * 60 * 60 * 1000);
 
 export default async function handler(req, res) {
   console.log('Attempting to connect to the database...');
@@ -11,38 +20,57 @@ export default async function handler(req, res) {
     const count = await Question.countDocuments();
     console.log(`Number of questions in the database: ${count}`);
 
-    let randomQuestion;
+    if (askedQuestions.size >= count && count > 0) {
+      return res.status(200).json({ gameCompleted: true, totalQuestions: count });
+    }
 
-    if (count === 0) {
-      console.log('No questions in the database, using questionManager');
-      const categories = Object.keys(questions);
-      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-      randomQuestion = questions[randomCategory][Math.floor(Math.random() * questions[randomCategory].length)];
-      randomQuestion = {
-        _id: randomQuestion.id,
-        hints: randomQuestion.hints,
-        category: randomCategory,
-        difficulty: 'medium'
-      };
-    } else {
-      const random = Math.floor(Math.random() * count);
-      randomQuestion = await Question.findOne().skip(random);
+    let randomQuestion;
+    let attempts = 0;
+    const maxAttempts = count > 0 ? count * 2 : 10; // Avoid infinite loop
+
+    do {
+      attempts++;
+      if (count === 0) {
+        console.log('No questions in the database, using questionManager');
+        const categories = Object.keys(questions);
+        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+        const categoryQuestions = questions[randomCategory];
+        const randomIndex = Math.floor(Math.random() * categoryQuestions.length);
+        const selectedQuestion = categoryQuestions[randomIndex];
+
+        randomQuestion = {
+          _id: selectedQuestion.id,
+          hints: selectedQuestion.hints,
+          category: randomCategory,
+          difficulty: selectedQuestion.difficulty || 'medium',
+        };
+      } else {
+        const random = Math.floor(Math.random() * count);
+        const candidateQuestion = await Question.findOne().skip(random).lean();
+        if (!askedQuestions.has(candidateQuestion._id.toString())) {
+          randomQuestion = candidateQuestion;
+        }
+      }
+    } while (!randomQuestion && attempts < maxAttempts);
+
+    if (attempts >= maxAttempts) {
+      return res.status(200).json({ gameCompleted: true, totalQuestions: count });
     }
 
     if (!randomQuestion) {
-      console.log('No random question found');
+      console.log('No random question found after maximum attempts');
       return res.status(404).json({ error: 'No questions found' });
     }
 
-    console.log('Random question found:', randomQuestion);
-
-    const { answer, ...questionWithoutAnswer } = randomQuestion.toObject ? randomQuestion.toObject() : randomQuestion;
+    // Remove the 'answer' field before adding to askedQuestions and sending
+    const { answer, ...questionWithoutAnswer } = randomQuestion;
+    askedQuestions.add(randomQuestion._id.toString());
 
     console.log('Sending question without answer:', questionWithoutAnswer);
 
     res.status(200).json(questionWithoutAnswer);
   } catch (error) {
     console.error('Error in random-question handler:', error);
-    res.status(500).json({ error: 'Error fetching random question', details: error.message, stack: error.stack });
+    res.status(500).json({ error: 'Error fetching random question' });
   }
 }
