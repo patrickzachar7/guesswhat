@@ -7,19 +7,15 @@ import Timer from './Timer';
 import ResultModal from './ResultModal';
 import PowerUps from './PowerUps';
 import { checkAchievements } from '../utils/achievements';
-import { addScore } from '../utils/leaderboard';
 import { earnCurrency, spendCurrency, getCurrencyBalance } from '../utils/currency';
 import GameOverModal from './GameOverModal';
-import dynamic from 'next/dynamic';
-
-const Confetti = dynamic(() => import('react-confetti'), { ssr: false });
 
 const InfiniteModeContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: ${({ theme }) => theme.spacing.large};
-  background-color: ${({ theme }) => theme.colors.background || '#f0f0f0'};
+  background-color: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
 `;
 
@@ -83,7 +79,6 @@ function InfiniteMode() {
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [revealedHints, setRevealedHints] = useState([]);
   const [hintIndex, setHintIndex] = useState(0);
-  const [score, setScore] = useState(0);
   const [lives, setLives] = useState(INITIAL_LIVES);
   const [combo, setCombo] = useState(0);
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME);
@@ -94,6 +89,7 @@ function InfiniteMode() {
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
   const [soundsEnabled, setSoundsEnabled] = useState(true);  
   const [currency, setCurrency] = useState(getCurrencyBalance());
+  const [lastPointsEarned, setLastPointsEarned] = useState(0);
   const [powerUps, setPowerUps] = useState({
     extraLife: 0,
     skipQuestion: 0,
@@ -124,9 +120,8 @@ function InfiniteMode() {
   }, []);
 
   const handleGameOver = useCallback(() => {
-    addScore(score);
     setIsGameOver(true);
-  }, [score]);
+  }, []);
 
   const handleIncorrectAnswer = useCallback(() => {
     setLives(prevLives => {
@@ -141,37 +136,31 @@ function InfiniteMode() {
     setShowResult(true);
   }, [handleGameOver]);
 
-  const calculateCurrentPointValue = useCallback(() => {
-    const maxPoints = 10;
-    const pointsLostPerHint = 1;
-    return Math.max(maxPoints - (hintIndex - 1) * pointsLostPerHint, 1);
-  }, [hintIndex]);
-
   const calculatePoints = useCallback((timeLeft) => {
-    const basePoints = calculateCurrentPointValue();
-    const timeBonus = Math.floor(timeLeft * 3.33); // Max 100 points time bonus
-    const comboMultiplier = 1 + combo * 0.1; // 10% increase per combo
-    return Math.floor((basePoints + timeBonus) * comboMultiplier);
-  }, [calculateCurrentPointValue, combo]);
+    const basePoints = Math.max(10 - hintIndex, 1);
+    const timeBonus = Math.floor((timeLeft / QUESTION_TIME) * 10);
+    const subtotal = basePoints + timeBonus;
+    const comboMultiplier = Math.min(1 + (combo * 0.1), 2);
+    const finalPoints = Math.floor(subtotal * comboMultiplier);
+    console.log(`Points calculation: Base(${basePoints}) + Time(${timeBonus}) * Combo(${comboMultiplier.toFixed(1)}x) = ${finalPoints}`);
+    return finalPoints;
+  }, [hintIndex, combo]);
 
   const handleCorrectAnswer = useCallback(() => {
     const pointsEarned = calculatePoints(timeLeft);
-    const newScore = score + pointsEarned;
-    setScore(newScore);
+    setCurrency(prev => prev + pointsEarned);
+    earnCurrency(pointsEarned);
     setCombo(prevCombo => prevCombo + 1);
-  
-    // Check for achievements
-    const newAchievements = checkAchievements(newScore, combo + 1);
+    setLastPointsEarned(pointsEarned);
+
+    const newAchievements = checkAchievements(currency + pointsEarned, combo + 1);
     setAchievements(prevAchievements => [...prevAchievements, ...newAchievements]);
-  
-    // Earn currency
-    const currencyEarned = Math.floor(pointsEarned / 10);
-    earnCurrency(currencyEarned);
-    setCurrency(getCurrencyBalance());
-    
+
     setIsCorrect(true);
     setShowResult(true);
-  }, [calculatePoints, timeLeft, score, combo]);
+
+    console.log(`Correct answer! Earned ${pointsEarned} points. New currency: ${currency + pointsEarned}`);
+  }, [calculatePoints, timeLeft, currency, combo]);
 
   const handleGuess = useCallback(async (guess) => {
     const guessText = typeof guess === 'object' ? guess.title : guess;
@@ -187,13 +176,13 @@ function InfiniteMode() {
           guess: guessText,
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       const data = await response.json();
-  
+
       if (data.correct) {
         handleCorrectAnswer();
       } else {
@@ -223,9 +212,10 @@ function InfiniteMode() {
 
   const buyPowerUp = useCallback((powerUp, cost) => {
     if (currency >= cost) {
-      spendCurrency(cost);
-      setCurrency(getCurrencyBalance());
-      setPowerUps(prev => ({ ...prev, [powerUp]: prev[powerUp] + 1 }));
+      if (spendCurrency(cost)) {
+        setCurrency(prev => prev - cost);
+        setPowerUps(prev => ({ ...prev, [powerUp]: prev[powerUp] + 1 }));
+      }
     }
   }, [currency]);
 
@@ -238,11 +228,12 @@ function InfiniteMode() {
     if (currentQuestion && hintIndex < currentQuestion.hints.length) {
       setRevealedHints(prev => [...prev, currentQuestion.hints[hintIndex]]);
       setHintIndex(prev => prev + 1);
+      console.log(`Revealed hint ${hintIndex + 1}. Points will decrease.`);
     }
   }, [currentQuestion, hintIndex]);
 
   const restartGame = useCallback(() => {
-    setScore(0);
+    setCurrency(getCurrencyBalance());
     setLives(INITIAL_LIVES);
     setCombo(0);
     setIsGameOver(false);
@@ -273,7 +264,7 @@ function InfiniteMode() {
   if (isGameOver) {
     return (
       <GameOverModal
-        score={score}
+        currency={currency}
         onRestart={restartGame}
         achievements={achievements}
       />
@@ -282,10 +273,10 @@ function InfiniteMode() {
 
   return (
     <InfiniteModeContainer>
-      <ScoreBoard score={score} lives={lives} combo={combo} currency={currency} />
+      <ScoreBoard currency={currency} lives={lives} combo={combo} />
       <Timer timeLeft={timeLeft} />
       <ContentWrapper>
-        <PointValue>Current base point value: {calculateCurrentPointValue()}</PointValue>
+        <PointValue>Current base point value: {Math.max(10 - hintIndex + 1, 1)}</PointValue>
         <PowerUps powerUps={powerUps} onUse={usePowerUp} onBuy={buyPowerUp} currency={currency} />
         {currentQuestion && !showResult && (
           <>
@@ -319,7 +310,8 @@ function InfiniteMode() {
             onNextQuestion={handleNextQuestion}
             animationsEnabled={animationsEnabled}
             soundsEnabled={soundsEnabled}
-            score={score}
+            pointsEarned={lastPointsEarned}
+            totalPoints={currency}
             achievements={achievements}
           />
         )}

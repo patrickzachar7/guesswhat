@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { shareScore } from '../utils/socialSharing';
 import useSound from 'use-sound';
 import Confetti from 'react-confetti';
+import { shareScore } from '../utils/socialSharing';
 
 const ModalOverlay = styled(motion.div)`
   position: fixed;
@@ -49,8 +48,15 @@ const Title = styled.h2`
 
 const ScoreText = styled.p`
   font-size: ${({ theme }) => theme.fontSizes.large};
-  margin-bottom: ${({ theme }) => theme.spacing.medium};
+  margin-bottom: ${({ theme }) => theme.spacing.small};
   color: ${({ theme }) => theme.colors.text};
+`;
+
+const TotalScoreText = styled.p`
+  font-size: ${({ theme }) => theme.fontSizes.xLarge};
+  margin-bottom: ${({ theme }) => theme.spacing.medium};
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: bold;
 `;
 
 const ButtonGroup = styled.div`
@@ -109,7 +115,8 @@ const ResultModal = ({
   onNextQuestion,
   animationsEnabled,
   soundsEnabled,
-  score,
+  pointsEarned,
+  totalPoints,
   achievements,
 }) => {
   const [playCorrect] = useSound('/sounds/correct.mp3', { volume: 0.5 });
@@ -126,7 +133,7 @@ const ResultModal = ({
   }, [isCorrect, soundsEnabled, playCorrect, playIncorrect]);
 
   const handleShare = () => {
-    shareScore(score);
+    shareScore(totalPoints);
   };
 
   return (
@@ -143,7 +150,12 @@ const ResultModal = ({
       >
         <CloseButton onClick={onNextQuestion}>&times;</CloseButton>
         <Title isCorrect={isCorrect}>{isCorrect ? 'Correct!' : 'Incorrect'}</Title>
-        <ScoreText>Your Score: {score}</ScoreText>
+        {isCorrect && (
+          <>
+            <ScoreText>You&apos;ve gained {pointsEarned} points</ScoreText>
+            <TotalScoreText>Total points: {totalPoints}</TotalScoreText>
+          </>
+        )}
         {achievements && achievements.length > 0 && (
           <AchievementsContainer>
             <AchievementsTitle>Achievements Unlocked:</AchievementsTitle>
@@ -156,6 +168,7 @@ const ResultModal = ({
         )}
         <ButtonGroup>
           <Button onClick={onNextQuestion}>Next Question</Button>
+          <Button onClick={handleShare}>Share Score</Button>
         </ButtonGroup>
       </ModalContent>
     </ModalOverlay>
