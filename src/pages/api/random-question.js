@@ -3,14 +3,18 @@ import Question from '../../models/Question';
 import { questions } from '../../utils/questionManager';
 
 export default async function handler(req, res) {
-  await dbConnect();
-
+  console.log('Attempting to connect to the database...');
   try {
+    await dbConnect();
+    console.log('Successfully connected to the database');
+
     const count = await Question.countDocuments();
+    console.log(`Number of questions in the database: ${count}`);
+
     let randomQuestion;
 
     if (count === 0) {
-      // If no questions in the database, return a random question from questionManager
+      console.log('No questions in the database, using questionManager');
       const categories = Object.keys(questions);
       const randomCategory = categories[Math.floor(Math.random() * categories.length)];
       randomQuestion = questions[randomCategory][Math.floor(Math.random() * questions[randomCategory].length)];
@@ -18,7 +22,7 @@ export default async function handler(req, res) {
         _id: randomQuestion.id,
         hints: randomQuestion.hints,
         category: randomCategory,
-        difficulty: 'medium' // You can adjust this as needed
+        difficulty: 'medium'
       };
     } else {
       const random = Math.floor(Math.random() * count);
@@ -26,15 +30,15 @@ export default async function handler(req, res) {
     }
 
     if (!randomQuestion) {
+      console.log('No random question found');
       return res.status(404).json({ error: 'No questions found' });
     }
 
-    // Remove the answer from the response
     const { answer, ...questionWithoutAnswer } = randomQuestion.toObject ? randomQuestion.toObject() : randomQuestion;
 
     res.status(200).json(questionWithoutAnswer);
   } catch (error) {
-    console.error('Error fetching random question:', error);
-    res.status(500).json({ error: 'Error fetching random question' });
+    console.error('Error in random-question handler:', error);
+    res.status(500).json({ error: 'Error fetching random question', details: error.message });
   }
 }

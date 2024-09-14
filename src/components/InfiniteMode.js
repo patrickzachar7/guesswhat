@@ -183,13 +183,13 @@ function InfiniteMode() {
           guess: guessText,
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       const data = await response.json();
-
+  
       if (data.correct) {
         handleCorrectAnswer();
       } else {
@@ -308,14 +308,16 @@ function InfiniteMode() {
             <GuessInput onSubmit={handleGuess} isInfinite={true} />
           </>
         )}
-        {showResult && (
-          <ResultModal
-            isCorrect={isCorrect}
-            onNextQuestion={handleNextQuestion}
-            animationsEnabled={animationsEnabled}
-            soundsEnabled={soundsEnabled}
-          />
-        )}
+   {showResult && (
+  <ResultModal
+    isCorrect={isCorrect}
+    onNextQuestion={handleNextQuestion}
+    animationsEnabled={animationsEnabled}
+    soundsEnabled={soundsEnabled}
+    score={score}
+    achievements={achievements}
+  />
+)}
       </ContentWrapper>
     </InfiniteModeContainer>
   );

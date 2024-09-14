@@ -15,10 +15,10 @@
     "axios": "^1.7.7",
     "framer-motion": "^6.3.3",
     "mongoose": "^8.6.2",
-    "next": "^12.1.6",
-    "react": "^18.1.0",
+    "next": "^14.2.11",
+    "react": "^18.3.1",
     "react-confetti": "^6.0.1",
-    "react-dom": "^18.1.0",
+    "react-dom": "^18.3.1",
     "styled-components": "^5.3.5",
     "use-sound": "^4.0.1"
   },

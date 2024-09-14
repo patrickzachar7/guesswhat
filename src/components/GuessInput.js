@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-
 
 const InputContainer = styled.div`
   position: relative;
@@ -11,23 +10,24 @@ const InputContainer = styled.div`
 
 const Input = styled.input`
   width: 100%;
-  padding: ${({ theme }) => theme.spacing.small};
+  padding: ${({ theme }) => theme.spacing.medium};
   font-size: ${({ theme }) => theme.fontSizes.medium};
-  border: 1px solid ${({ theme }) => theme.colors.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.borderRadius};
 `;
 
 const SuggestionList = styled.ul`
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
   background-color: ${({ theme }) => theme.colors.background};
-  border: 1px solid ${({ theme }) => theme.colors.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-top: none;
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
+  border-radius: 0 0 ${({ theme }) => theme.borderRadius} ${({ theme }) => theme.borderRadius};
   max-height: 200px;
   overflow-y: auto;
   z-index: 1;
@@ -36,41 +36,48 @@ const SuggestionList = styled.ul`
 const SuggestionItem = styled.li`
   padding: ${({ theme }) => theme.spacing.small};
   cursor: pointer;
-  display: flex;
-  align-items: center;
   &:hover {
-    background-color: ${({ theme }) => theme.colors.secondary};
+    background-color: ${({ theme }) => theme.colors.hover};
   }
 `;
 
 const SuggestionImage = styled.img`
   width: 50px;
   height: 75px;
-  object-fit: cover;
   margin-right: ${({ theme }) => theme.spacing.small};
+  vertical-align: middle;
 `;
 
 function GuessInput({ onSubmit, isInfinite }) {
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState([]);
+  const [error, setError] = useState('');
 
   const fetchSuggestions = useCallback(async (query) => {
+    if (query.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+
     try {
       const response = await axios.get('/api/movie-suggestions', {
-        params: { query },
+        params: { query, category: isInfinite ? 'infinite' : 'daily' },
       });
-      setSuggestions(response.data.results);
+      setSuggestions(response.data || []);
+      setError('');
     } catch (error) {
       console.error('Error fetching suggestions:', error);
-    }
-  }, []); // Dependency array added here
-
-  useEffect(() => {
-    if (inputValue.length >= 3) {
-      fetchSuggestions(inputValue);
-    } else {
+      setError('Failed to fetch suggestions. Please try again.');
       setSuggestions([]);
     }
+  }, [isInfinite]);
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      fetchSuggestions(inputValue);
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
   }, [inputValue, fetchSuggestions]);
 
   const handleInputChange = (e) => {
@@ -84,15 +91,21 @@ function GuessInput({ onSubmit, isInfinite }) {
     setSuggestions([]);
   };
 
+  const handleSuggestionClick = (suggestion) => {
+    onSubmit(suggestion.title);
+    setInputValue(suggestion.title);
+    setSuggestions([]);
+  };
+
   return (
     <InputContainer>
-       <form onSubmit={handleSubmit}>
-      <Input
-        type="text"
-        value={inputValue}
-        onChange={handleInputChange}
-        placeholder="Enter your guess"
-      />
+      <form onSubmit={handleSubmit}>
+        <Input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="Enter your guess"
+        />
       </form>
       {error && <p style={{color: 'red'}}>{error}</p>}
       {suggestions.length > 0 && (

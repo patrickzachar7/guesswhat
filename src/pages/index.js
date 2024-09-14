@@ -1,4 +1,3 @@
-import React from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -11,30 +10,29 @@ const HomeContainer = styled.div`
   min-height: 100vh;
   padding: ${({ theme }) => theme.spacing.large};
   background-color: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.text};
 `;
 
 const Title = styled.h1`
-  font-size: ${({ theme }) => theme.fontSizes.xLarge};
+  font-size: ${({ theme }) => theme.fontSizes.xxlarge};
+  color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing.large};
   text-align: center;
 `;
 
 const Description = styled.p`
   font-size: ${({ theme }) => theme.fontSizes.medium};
-  margin-bottom: ${({ theme }) => theme.spacing.large};
-  text-align: center;
+  color: ${({ theme }) => theme.colors.text};
   max-width: 600px;
+  text-align: center;
+  margin-bottom: ${({ theme }) => theme.spacing.xlarge};
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.medium};
-  flex-wrap: wrap;
-  justify-content: center;
 `;
 
-const StyledLink = styled(motion.a)`
+const StyledLink = styled.a`
   padding: ${({ theme }) => theme.spacing.medium} ${({ theme }) => theme.spacing.large};
   background-color: ${({ theme, variant }) => theme.colors[variant] || theme.colors.primary};
   color: #FFFFFF;
@@ -50,6 +48,8 @@ const StyledLink = styled(motion.a)`
   }
 `;
 
+const MotionLink = motion(StyledLink);
+
 const buttonVariants = {
   hover: { scale: 1.05 },
   tap: { scale: 0.95 }
@@ -63,26 +63,24 @@ function HomePage() {
         Test your movie knowledge with our exciting guessing game! Challenge yourself or compete with friends in our Infinite Mode.
       </Description>
       <ButtonContainer>
-        <Link href="/infinite-mode" passHref>
-          <StyledLink
-            as={motion.a}
+        <Link href="/infinite-mode" passHref legacyBehavior>
+          <MotionLink
             variants={buttonVariants}
             whileHover="hover"
             whileTap="tap"
             variant="infinite"
           >
             Infinite Mode
-          </StyledLink>
+          </MotionLink>
         </Link>
-        <Link href="/leaderboard" passHref>
-          <StyledLink
-            as={motion.a}
+        <Link href="/leaderboard" passHref legacyBehavior>
+          <MotionLink
             variants={buttonVariants}
             whileHover="hover"
             whileTap="tap"
           >
             Leaderboard
-          </StyledLink>
+          </MotionLink>
         </Link>
       </ButtonContainer>
     </HomeContainer>

@@ -20,31 +20,30 @@ export default async function handler(req, res) {
       include_adult: false
     };
 
-    // Adjust the search based on the category
+    // Add additional parameters for daily and infinite modes
     if (category === 'daily' || category === 'infinite') {
-      // For daily and infinite modes, we might want to search in a specific list or with specific criteria
-      // This is just an example, adjust according to your specific requirements
-      endpoint = `${TMDB_BASE_URL}/discover/movie`;
       params = {
         ...params,
-        sort_by: 'popularity.desc',
-        'primary_release_date.gte': '1990-01-01', // Example: Only movies from 1990 onwards
-        'vote_count.gte': 1000 // Example: Only movies with at least 1000 votes
+        'vote_count.gte': 100, // Ensure some popularity
+        sort_by: 'vote_average.desc' // Sort by rating
       };
     }
 
     const response = await axios.get(endpoint, { params });
 
-    const suggestions = response.data.results.map(movie => ({
-      id: movie.id,
-      title: movie.title,
-      poster_path: movie.poster_path,
-      release_date: movie.release_date
-    }));
+    const suggestions = response.data.results
+      .filter(movie => movie.title.toLowerCase().includes(query.toLowerCase()))
+      .map(movie => ({
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+        release_date: movie.release_date
+      }))
+      .slice(0, 5); // Limit to top 5 results
 
     res.status(200).json(suggestions);
   } catch (error) {
     console.error('Error fetching movie suggestions:', error);
-    res.status(500).json({ error: 'Error fetching movie suggestions' });
+    res.status(500).json({ error: 'Error fetching movie suggestions', details: error.message });
   }
 }
