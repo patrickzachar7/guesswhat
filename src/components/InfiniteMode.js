@@ -25,6 +25,9 @@ const InfiniteModeContainer = styled.div`
 
 const TopSection = styled.div`
   padding: ${({ theme }) => theme.spacing.medium};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const StoreSection = styled.div`
@@ -51,22 +54,23 @@ const Question = styled.h2`
 
 const HintContainer = styled.div`
   flex-grow: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: flex-end;
+  overflow-y: auto;
   padding: ${({ theme }) => theme.spacing.small};
 `;
 
 const HintText = styled(motion.p)`
-  font-size: ${({ theme }) => theme.fontSizes.medium};
+  font-size: ${({ theme }) => theme.fontSizes.small};
   color: ${({ theme }) => theme.colors.text};
-  margin-bottom: ${({ theme }) => theme.spacing.small};
-  padding: ${({ theme }) => theme.spacing.small};
+  margin-bottom: ${({ theme }) => theme.spacing.xsmall};
+  padding: ${({ theme }) => theme.spacing.xsmall};
   background-color: ${({ theme }) => theme.colors.secondaryBackground};
   border-radius: ${({ theme }) => theme.borderRadius};
-  text-align: center;
+  text-align: left;
   max-width: 80%;
+  align-self: flex-start;
 `;
 
 const BottomSection = styled.div`
@@ -153,69 +157,34 @@ function InfiniteMode() {
       setRevealedHints([data.hints[0]]);
       setHintIndex(1);
       setTimeLeft(QUESTION_TIME);
-      setCorrectAnswer('');
+      setIsLoading(false);
     } catch (error) {
-      console.error('Error fetching question:', error);
-      setCurrentQuestion(null);
+      console.error('Error loading question:', error);
       setError(error);
-    } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const handleGameOver = useCallback(() => {
-    setIsGameOver(true);
-  }, []);
+  const handleCorrectAnswer = useCallback(() => {
+    setIsCorrect(true);
+    setCombo((prev) => prev + 1);
+    const pointsEarned = 10 + combo * 2;
+    setLastPointsEarned(pointsEarned);
+    const newCurrency = earnCurrency(pointsEarned);
+    setCurrency(newCurrency);
+    setTotalQuestionsAnswered((prev) => prev + 1);
+    const newAchievements = checkAchievements(totalQuestionsAnswered + 1, combo + 1);
+    setAchievements(newAchievements);
+  }, [combo, totalQuestionsAnswered]);
 
   const handleIncorrectAnswer = useCallback(() => {
-    setLives((prevLives) => {
-      const newLives = prevLives - 1;
-      if (newLives <= 0) {
-        handleGameOver();
-      }
-      return newLives;
-    });
-    setCombo(0);
     setIsCorrect(false);
-    setShowResult(true);
-    setTotalQuestionsAnswered((prev) => prev + 1);
-    setTotalHintsUsed((prev) => prev + hintIndex - 1);
-  }, [handleGameOver, hintIndex]);
-
-  const calculatePoints = useCallback(
-    (timeLeft) => {
-      const basePoints = Math.max(10 - hintIndex + 1, 1);
-      const timeBonus = Math.floor((timeLeft / QUESTION_TIME) * 10);
-      const subtotal = basePoints + timeBonus;
-      const comboMultiplier = Math.min(1 + combo * 0.1, 2);
-      const finalPoints = Math.floor(subtotal * comboMultiplier);
-      console.log(
-        `Points calculation: Base(${basePoints}) + Time(${timeBonus}) * Combo(${comboMultiplier.toFixed(
-          1
-        )}x) = ${finalPoints}`
-      );
-      return finalPoints;
-    },
-    [hintIndex, combo]
-  );
-
-  const handleCorrectAnswer = useCallback(() => {
-    const pointsEarned = calculatePoints(timeLeft);
-    setCurrency((prev) => prev + pointsEarned);
-    earnCurrency(pointsEarned);
-    setCombo((prevCombo) => prevCombo + 1);
-    setLastPointsEarned(pointsEarned);
-
-    const newAchievements = checkAchievements(currency + pointsEarned, combo + 1);
-    setAchievements((prevAchievements) => [...prevAchievements, ...newAchievements]);
-
-    setIsCorrect(true);
-    setShowResult(true);
-    setTotalQuestionsAnswered((prev) => prev + 1);
-    setTotalHintsUsed((prev) => prev + hintIndex - 1);
-
-    console.log(`Correct answer! Earned ${pointsEarned} points. New currency: ${currency + pointsEarned}`);
-  }, [calculatePoints, timeLeft, currency, combo, hintIndex]);
+    setCombo(0);
+    setLives((prev) => prev - 1);
+    if (lives - 1 <= 0) {
+      setIsGameOver(true);
+    }
+  }, [lives]);
 
   const handleGuess = useCallback(
     async (guess) => {
@@ -296,6 +265,7 @@ function InfiniteMode() {
     if (currentQuestion && hintIndex < currentQuestion.hints.length) {
       setRevealedHints((prev) => [...prev, currentQuestion.hints[hintIndex]]);
       setHintIndex((prev) => prev + 1);
+      setTotalHintsUsed((prev) => prev + 1);
       console.log(`Revealed hint ${hintIndex + 1}. Points will decrease.`);
     }
   }, [currentQuestion, hintIndex]);
@@ -378,7 +348,7 @@ function InfiniteMode() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5 }}
                 >
-                  {hint}
+                  {index + 1}. {hint}
                 </HintText>
               ))}
             </AnimatePresence>
