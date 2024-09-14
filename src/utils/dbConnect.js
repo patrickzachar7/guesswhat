@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const CONNECTION_TIMEOUT = 5000; // 5 seconds
+const CONNECTION_TIMEOUT = 10000; // Increase to 10 seconds
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');
@@ -44,7 +44,7 @@ async function dbConnect() {
     cached.conn = await Promise.race([
       cached.promise,
       new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection timeout')), CONNECTION_TIMEOUT)
+        setTimeout(() => reject(new Error(`Connection timeout after ${CONNECTION_TIMEOUT}ms`)), CONNECTION_TIMEOUT)
       )
     ]);
   } catch (e) {
