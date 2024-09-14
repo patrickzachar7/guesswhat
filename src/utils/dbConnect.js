@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const CONNECTION_TIMEOUT = 10000; // Increase to 10 seconds
+const CONNECTION_TIMEOUT = 10000; // 10 seconds
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');
@@ -20,11 +20,8 @@ async function dbConnect() {
 
   if (!cached.promise) {
     const opts = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       bufferCommands: false,
       serverSelectionTimeoutMS: CONNECTION_TIMEOUT,
-      connectTimeoutMS: CONNECTION_TIMEOUT,
       socketTimeoutMS: CONNECTION_TIMEOUT,
     };
 
