@@ -18,21 +18,18 @@ const Input = styled.input`
 `;
 
 const SuggestionList = styled.ul`
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
   position: absolute;
-  top: 100%;
+  bottom: 100%; // Change this from 'top: 100%' to 'bottom: 100%'
   left: 0;
   right: 0;
   background-color: ${({ theme }) => theme.colors.background};
   border: 1px solid ${({ theme }) => theme.colors.border};
-  border-top: none;
-  border-radius: 0 0 ${({ theme }) => theme.borderRadius} ${({ theme }) => theme.borderRadius};
+  border-radius: ${({ theme }) => theme.borderRadius};
   max-height: 200px;
   overflow-y: auto;
-  z-index: 1;
+  z-index: 10;
 `;
+
 
 const SuggestionItem = styled.li`
   padding: ${({ theme }) => theme.spacing.small};

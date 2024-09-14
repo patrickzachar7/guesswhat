@@ -82,6 +82,7 @@ const InputContainer = styled.div`
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
+  position: relative;
 `;
 
 const HintButton = styled.button`
