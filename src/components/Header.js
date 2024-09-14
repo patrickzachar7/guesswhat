@@ -63,7 +63,7 @@ function Header({ toggleDarkMode, isDarkMode }) {
           <NavLink>Leaderboard</NavLink>
         </Link>
       </Nav>
-      <ScoreDisplay>Scoree: {score}</ScoreDisplay>
+      <ScoreDisplay>Score: {score}</ScoreDisplay>
       <ThemeToggle onClick={toggleDarkMode}>
         <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
       </ThemeToggle>
