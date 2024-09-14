@@ -1,0 +1,36 @@
+.guess-input-container {
+    position: relative;
+  }
+  
+  .suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .suggestions-list li {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .suggestions-list li.selected {
+    background-color: #f0f0f0;
+  }
+  
+  .loading-indicator, .error-message {
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .error-message {
+    color: red;
+  }

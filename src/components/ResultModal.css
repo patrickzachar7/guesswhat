@@ -1,0 +1,30 @@
+/* src/components/ResultModal.css */
+.result-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .result-modal h2 {
+    color: #fff;
+    font-size: 4rem;
+    margin-bottom: 20px;
+  }
+  
+  .result-modal button {
+    padding: 15px 30px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
