@@ -1,3 +1,5 @@
+// src/components/Header.js
+
 import React from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
@@ -9,16 +11,17 @@ const HeaderContainer = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: ${props => props.theme.spacing.medium};
-  background-color: ${props => props.theme.colors.primary};
-  color: #FFFFFF;
+  padding: ${({ theme }) => theme.spacing.medium};
+  background-color: ${({ theme }) => theme.colors.headerBackground};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.headerBorder};
+  color: ${({ theme }) => theme.colors.text};
 `;
 
-const Logo = styled.span`
-  font-size: ${props => props.theme.fontSizes.large};
+const Logo = styled.a`
+  font-size: ${({ theme }) => theme.fontSizes.large};
   font-weight: bold;
   text-decoration: none;
-  color: #FFFFFF;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const Nav = styled.nav`
@@ -27,7 +30,7 @@ const Nav = styled.nav`
 `;
 
 const NavLink = styled.a`
-  color: #FFFFFF;
+  color: ${({ theme }) => theme.colors.text};
   text-decoration: none;
   &:hover {
     text-decoration: underline;
@@ -35,14 +38,14 @@ const NavLink = styled.a`
 `;
 
 const ScoreDisplay = styled.span`
-  font-size: ${props => props.theme.fontSizes.medium};
+  font-size: ${({ theme }) => theme.fontSizes.medium};
 `;
 
 const ThemeToggle = styled.button`
   background: none;
   border: none;
-  color: #FFFFFF;
-  font-size: ${props => props.theme.fontSizes.medium};
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSizes.large};
   cursor: pointer;
 `;
 
