@@ -5,21 +5,23 @@ export const lightTheme = {
   colors: {
     primary: '#2D2D2D', // Dark gray for primary text
     secondary: '#4F4F4F', // Medium gray for secondary elements
-    background: '#F9F9F9', // Light gray background
-    text: '#2D2D2D', // Consistent text color
-    headerBackground: '#FFFFFF', // White header to match the light theme
-    headerBorder: '#E0E0E0', // Light gray border for header
-    buttonBackground: '#E0E0E0', // Light gray button background
-    buttonHover: '#D5D5D5', // Slightly darker gray on hover
+    background: '#FFFFFF', // White background for light theme
+    text: '#2D2D2D', // Dark text for readability
+    headerBackground: '#FFFFFF', // White header to match the background
+    headerBorder: '#E0E0E0', // Light grey border for header
+    buttonBackground: '#E0E0E0', // Light grey button background
+    buttonHover: '#D5D5D5', // Slightly darker grey on hover
     disabledBackground: '#E8E8E8',
     disabledText: '#A0A0A0',
     success: '#27AE60', // Green for success messages
     error: '#EB5757', // Red for error messages
     warning: '#F2C94C', // Yellow for warnings
     info: '#2F80ED', // Blue for informational messages
-    inputBackground: '#FFFFFF',
+    inputBackground: '#F9F9F9',
     cardBackground: '#FFFFFF',
     border: '#E0E0E0',
+    tooltipBackground: 'rgba(0, 0, 0, 0.85)',
+    tooltipText: '#FFFFFF',
   },
   fonts: {
     main: "'Inter', sans-serif",
@@ -39,20 +41,20 @@ export const lightTheme = {
     large: '1.5rem', // 24px
     xLarge: '2rem', // 32px
   },
-  borderRadius: '0.5rem', // 8px for a subtle rounded feel
-  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // Soft shadow for depth
+  borderRadius: '0.5rem', // 8px for subtle rounding
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // Soft shadow
 };
 
 export const darkTheme = {
   colors: {
-    primary: '#E0E0E0', // Light gray for primary text
-    secondary: '#B3B3B3', // Medium gray for secondary elements
-    background: '#1A1A1A', // Dark background
+    primary: '#E0E0E0', // Light grey for primary text
+    secondary: '#B3B3B3', // Medium grey for secondary elements
+    background: '#1A1A1A', // Dark background for dark theme
     text: '#E0E0E0', // Light text for readability
-    headerBackground: '#2A2A2A', // Dark header to match the dark theme
-    headerBorder: '#4F4F4F', // Dark gray border for header
-    buttonBackground: '#4F4F4F', // Dark gray button background
-    buttonHover: '#5A5A5A', // Slightly lighter gray on hover
+    headerBackground: '#1A1A1A', // Dark header to match the background
+    headerBorder: '#4F4F4F', // Dark grey border for header
+    buttonBackground: '#4F4F4F', // Dark grey button background
+    buttonHover: '#5A5A5A', // Slightly lighter grey on hover
     disabledBackground: '#3A3A3A',
     disabledText: '#6A6A6A',
     success: '#27AE60',
@@ -62,6 +64,8 @@ export const darkTheme = {
     inputBackground: '#2A2A2A',
     cardBackground: '#2A2A2A',
     border: '#4F4F4F',
+    tooltipBackground: 'rgba(255, 255, 255, 0.85)',
+    tooltipText: '#1A1A1A',
   },
   fonts: {
     main: "'Inter', sans-serif",
