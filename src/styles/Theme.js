@@ -3,29 +3,26 @@ import { createGlobalStyle } from 'styled-components';
 
 export const lightTheme = {
   colors: {
-    primary: '#0D0D0D', // Near black for text
-    secondary: '#2563EB', // Blue accent
-    secondaryHover: '#1D4ED8', // Darker blue for hover effect
-    background: '#FFFFFF', // Pure white background
-    text: '#0D0D0D', // Near black for readability
-    disabledBackground: '#E5E7EB', // Light gray for disabled buttons
-    disabledText: '#9CA3AF', // Medium gray for disabled text
-    tooltipBackground: 'rgba(0, 0, 0, 0.85)', // Dark tooltip background
-    tooltipText: '#FFFFFF', // White text for tooltips
-    success: '#22C55E', // Green for success messages
-    error: '#EF4444', // Red for error messages
-    warning: '#FBBF24', // Yellow for warnings
-    info: '#3B82F6', // Blue for informational messages
-    dailyChallenge: '#9333EA', // Purple accent
-    dailyChallengeHover: '#7E22CE', // Darker purple
-    infinite: '#DB2777', // Pink accent
-    infiniteHover: '#BE185D', // Darker pink
-    inputBackground: '#F9FAFB', // Slight off-white for inputs
-    cardBackground: '#F3F4F6', // Light gray for card backgrounds
-    border: '#E5E7EB', // Light gray for borders
+    primary: '#2D2D2D', // Dark gray for primary text
+    secondary: '#4F4F4F', // Medium gray for secondary elements
+    background: '#F9F9F9', // Light gray background
+    text: '#2D2D2D', // Consistent text color
+    headerBackground: '#FFFFFF', // White header to match the light theme
+    headerBorder: '#E0E0E0', // Light gray border for header
+    buttonBackground: '#E0E0E0', // Light gray button background
+    buttonHover: '#D5D5D5', // Slightly darker gray on hover
+    disabledBackground: '#E8E8E8',
+    disabledText: '#A0A0A0',
+    success: '#27AE60', // Green for success messages
+    error: '#EB5757', // Red for error messages
+    warning: '#F2C94C', // Yellow for warnings
+    info: '#2F80ED', // Blue for informational messages
+    inputBackground: '#FFFFFF',
+    cardBackground: '#FFFFFF',
+    border: '#E0E0E0',
   },
   fonts: {
-    main: "'Nunito Sans', sans-serif",
+    main: "'Inter', sans-serif",
   },
   fontSizes: {
     xSmall: '0.75rem', // 12px
@@ -42,35 +39,32 @@ export const lightTheme = {
     large: '1.5rem', // 24px
     xLarge: '2rem', // 32px
   },
-  borderRadius: '0.75rem', // 12px for a modern rounded feel
-  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth
+  borderRadius: '0.5rem', // 8px for a subtle rounded feel
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // Soft shadow for depth
 };
 
 export const darkTheme = {
   colors: {
-    primary: '#FFFFFF', // White text on dark background
-    secondary: '#3B82F6', // Blue accent
-    secondaryHover: '#2563EB', // Darker blue for hover
-    background: '#1F2937', // Dark gray background
-    text: '#FFFFFF', // White text for readability
-    disabledBackground: '#4B5563', // Dark gray for disabled buttons
-    disabledText: '#9CA3AF', // Medium gray for disabled text
-    tooltipBackground: 'rgba(255, 255, 255, 0.85)', // Light tooltip background
-    tooltipText: '#1F2937', // Dark text for tooltips
-    success: '#22C55E', // Green for success messages
-    error: '#EF4444', // Red for error messages
-    warning: '#FBBF24', // Yellow for warnings
-    info: '#3B82F6', // Blue for informational messages
-    dailyChallenge: '#8B5CF6', // Violet accent
-    dailyChallengeHover: '#7C3AED', // Darker violet
-    infinite: '#EC4899', // Pink accent
-    infiniteHover: '#DB2777', // Darker pink
-    inputBackground: '#374151', // Dark gray for inputs
-    cardBackground: '#1F2937', // Dark background for cards
-    border: '#4B5563', // Dark gray for borders
+    primary: '#E0E0E0', // Light gray for primary text
+    secondary: '#B3B3B3', // Medium gray for secondary elements
+    background: '#1A1A1A', // Dark background
+    text: '#E0E0E0', // Light text for readability
+    headerBackground: '#2A2A2A', // Dark header to match the dark theme
+    headerBorder: '#4F4F4F', // Dark gray border for header
+    buttonBackground: '#4F4F4F', // Dark gray button background
+    buttonHover: '#5A5A5A', // Slightly lighter gray on hover
+    disabledBackground: '#3A3A3A',
+    disabledText: '#6A6A6A',
+    success: '#27AE60',
+    error: '#EB5757',
+    warning: '#F2C94C',
+    info: '#2F80ED',
+    inputBackground: '#2A2A2A',
+    cardBackground: '#2A2A2A',
+    border: '#4F4F4F',
   },
   fonts: {
-    main: "'Nunito Sans', sans-serif",
+    main: "'Inter', sans-serif",
   },
   fontSizes: {
     xSmall: '0.75rem',
@@ -87,8 +81,8 @@ export const darkTheme = {
     large: '1.5rem',
     xLarge: '2rem',
   },
-  borderRadius: '0.75rem',
-  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
+  borderRadius: '0.5rem',
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
 };
 
 export const GlobalStyle = createGlobalStyle`
@@ -102,12 +96,30 @@ export const GlobalStyle = createGlobalStyle`
     transition: all 0.3s linear;
   }
 
+  header {
+    background-color: ${({ theme }) => theme.colors.headerBackground};
+    border-bottom: 1px solid ${({ theme }) => theme.colors.headerBorder};
+  }
+
   button {
     font-family: ${({ theme }) => theme.fonts.main};
     cursor: pointer;
     border: none;
     border-radius: ${({ theme }) => theme.borderRadius};
-    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: ${({ theme }) => theme.colors.buttonBackground};
+    color: ${({ theme }) => theme.colors.text};
+    padding: ${({ theme }) => theme.spacing.small} ${({ theme }) => theme.spacing.medium};
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: ${({ theme }) => theme.colors.buttonHover};
+  }
+
+  button:disabled {
+    background-color: ${({ theme }) => theme.colors.disabledBackground};
+    color: ${({ theme }) => theme.colors.disabledText};
+    cursor: not-allowed;
   }
 
   input, textarea {
@@ -118,6 +130,7 @@ export const GlobalStyle = createGlobalStyle`
     background-color: ${({ theme }) => theme.colors.inputBackground};
     color: ${({ theme }) => theme.colors.text};
     transition: border-color 0.3s ease;
+    width: 100%;
   }
 
   input:focus, textarea:focus {
