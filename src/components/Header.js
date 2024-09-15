@@ -51,22 +51,13 @@ function Header({ toggleDarkMode, isDarkMode }) {
 
   return (
     <HeaderContainer>
-      <Logo>Guess What</Logo>
-      <Nav>
-        <Link href="/" passHref>
-          <NavLink>Home</NavLink>
-        </Link>
-        <Link href="/infinite-mode" passHref>
-          <NavLink>Infinite Mode</NavLink>
-        </Link>
-        <Link href="/leaderboard" passHref>
-          <NavLink>Leaderboard</NavLink>
-        </Link>
-      </Nav>
-      <ScoreDisplay>Score: {score}</ScoreDisplay>
       <ThemeToggle onClick={toggleDarkMode}>
         <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
       </ThemeToggle>
+      <Link href="/" passHref>
+        <Logo>Guess What</Logo>
+      </Link>
+      <div style={{ width: '24px' }}></div> {/* Placeholder to balance the layout */}
     </HeaderContainer>
   );
 }
