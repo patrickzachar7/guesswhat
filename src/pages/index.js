@@ -8,47 +8,56 @@ const HomeContainer = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: ${({ theme }) => theme.spacing.large};
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
 const Title = styled.h1`
-  font-size: ${({ theme }) => theme.fontSizes.xxlarge};
+  font-size: ${({ theme }) => theme.fontSizes.xLarge};
   color: ${({ theme }) => theme.colors.primary};
+  font-weight: bold;
   margin-bottom: ${({ theme }) => theme.spacing.large};
   text-align: center;
 `;
 
 const Description = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.medium};
+  font-size: ${({ theme }) => theme.fontSizes.large};
   color: ${({ theme }) => theme.colors.text};
-  max-width: 600px;
+  max-width: 500px;
   text-align: center;
-  margin-bottom: ${({ theme }) => theme.spacing.xlarge};
+  margin-bottom: ${({ theme }) => theme.spacing.xLarge};
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
-  gap: ${({ theme }) => theme.spacing.medium};
+  justify-content: center;
+  margin-top: ${({ theme }) => theme.spacing.large};
 `;
 
-const StyledLink = styled.a`
-  padding: ${({ theme }) => theme.spacing.medium} ${({ theme }) => theme.spacing.large};
-  background-color: ${({ theme, variant }) => theme.colors[variant] || theme.colors.primary};
-  color: #FFFFFF;
+const PlayButton = styled(motion.a)`
+  padding: ${({ theme }) => theme.spacing.medium} ${({ theme }) => theme.spacing.large}; 
+  background-color: #000000; // Black button color
+  color: ${({ theme }) => theme.colors.buttonText || '#FFFFFF'};
   text-decoration: none;
-  border-radius: ${({ theme }) => theme.borderRadius};
-  font-size: ${({ theme }) => theme.fontSizes.medium};
+  border-radius: 50px; // Fully rounded button
+  font-size: ${({ theme }) => theme.fontSizes.large};
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  min-width: 180px; // Approximation of Wordle's Play button width
+  text-align: center;
 
   &:hover {
-    background-color: ${({ theme, variant }) => theme.colors[`${variant}Hover`] || theme.colors.primaryHover};
+    background-color: ${({ theme }) => theme.colors.hover};
   }
 `;
 
-const MotionLink = motion(StyledLink);
+const Footer = styled.footer`
+  position: absolute;
+  bottom: 20px;
+  font-size: ${({ theme }) => theme.fontSizes.small};
+  color: ${({ theme }) => theme.colors.text};
+  text-align: center;
+`;
 
 const buttonVariants = {
   hover: { scale: 1.05 },
@@ -58,31 +67,24 @@ const buttonVariants = {
 function HomePage() {
   return (
     <HomeContainer>
-      <Title>Welcome to Guess What</Title>
+      <Title>Guess What</Title>
       <Description>
-        Test your movie knowledge with our exciting guessing game! Challenge yourself or compete with friends in our Infinite Mode.
+        Test your knowledge with Guess What, a fun and exciting guessing game! Can you guess the correct answer before time runs out?
       </Description>
       <ButtonContainer>
         <Link href="/infinite-mode" passHref legacyBehavior>
-          <MotionLink
-            variants={buttonVariants}
-            whileHover="hover"
-            whileTap="tap"
-            variant="infinite"
-          >
-            Infinite Mode
-          </MotionLink>
-        </Link>
-        <Link href="/leaderboard" passHref legacyBehavior>
-          <MotionLink
+          <PlayButton
             variants={buttonVariants}
             whileHover="hover"
             whileTap="tap"
           >
-            Leaderboard
-          </MotionLink>
+            Play
+          </PlayButton>
         </Link>
       </ButtonContainer>
+      <Footer>
+        Created by Patrick Zachar
+      </Footer>
     </HomeContainer>
   );
 }
