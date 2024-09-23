@@ -1,71 +1,76 @@
-// src/Theme.js
 import { createGlobalStyle } from 'styled-components';
 
 export const lightTheme = {
   colors: {
-    primary: '#2D2D2D', // Dark gray for primary text
-    secondary: '#4F4F4F', // Medium gray for secondary elements
-    background: '#FFFFFF', // White background for light theme
-    text: '#2D2D2D', // Dark text for readability
-    headerBackground: '#FFFFFF', // White header to match the background
-    headerBorder: '#E0E0E0', // Light grey border for header
-    buttonBackground: '#E0E0E0', // Light grey button background
-    buttonHover: '#D5D5D5', // Slightly darker grey on hover
+    primary: '#1A1A1A', // Darker gray for better text readability
+    secondary: '#4F4F4F', 
+    background: '#F0F0F0', // Softer light background for reduced eye strain
+    text: '#2D2D2D', 
+    headerBackground: '#FFFFFF',
+    headerBorder: '#D0D0D0', 
+    buttonBackground: '#E0E0E0', 
+    buttonHover: '#CFCFCF', 
     disabledBackground: '#E8E8E8',
     disabledText: '#A0A0A0',
-    success: '#27AE60', // Green for success messages
-    error: '#EB5757', // Red for error messages
-    warning: '#F2C94C', // Yellow for warnings
-    info: '#2F80ED', // Blue for informational messages
-    inputBackground: '#F9F9F9',
+    success: '#6AAA64', // Wordle-like green for success feedback
+    error: '#EB5757',
+    warning: '#C9B458', // Wordle-like yellow for warning
+    info: '#2F80ED',
+    inputBackground: '#F7F7F7', // Slightly lighter to indicate editable areas
     cardBackground: '#FFFFFF',
     border: '#E0E0E0',
     tooltipBackground: 'rgba(0, 0, 0, 0.85)',
     tooltipText: '#FFFFFF',
+    correct: '#6AAA64', // Green for correct guesses
+    semiCorrect: '#C9B458', // Yellow for partially correct guesses
+    incorrect: '#787C7E', // Gray for incorrect guesses
   },
   fonts: {
     main: "'Inter', sans-serif",
   },
   fontSizes: {
-    xSmall: '0.75rem', // 12px
-    small: '0.875rem', // 14px
-    medium: '1rem', // 16px
-    large: '1.25rem', // 20px
-    xLarge: '1.5rem', // 24px
-    xxLarge: '2rem', // 32px
+    xSmall: '0.75rem',
+    small: '0.875rem',
+    medium: '1rem',
+    large: '1.25rem',
+    xLarge: '1.5rem',
+    xxLarge: '2rem',
   },
   spacing: {
-    xSmall: '0.25rem', // 4px
-    small: '0.5rem', // 8px
-    medium: '1rem', // 16px
-    large: '1.5rem', // 24px
-    xLarge: '2rem', // 32px
+    xSmall: '0.25rem',
+    small: '0.5rem',
+    medium: '1rem',
+    large: '1.5rem',
+    xLarge: '2rem',
   },
-  borderRadius: '0.5rem', // 8px for subtle rounding
-  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // Soft shadow
+  borderRadius: '0.5rem',
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
 };
 
 export const darkTheme = {
   colors: {
-    primary: '#E0E0E0', // Light grey for primary text
-    secondary: '#B3B3B3', // Medium grey for secondary elements
-    background: '#1A1A1A', // Dark background for dark theme
-    text: '#E0E0E0', // Light text for readability
-    headerBackground: '#1A1A1A', // Dark header to match the background
-    headerBorder: '#4F4F4F', // Dark grey border for header
-    buttonBackground: '#4F4F4F', // Dark grey button background
-    buttonHover: '#5A5A5A', // Slightly lighter grey on hover
+    primary: '#E0E0E0',
+    secondary: '#B3B3B3',
+    background: '#1A1A1A',
+    text: '#E0E0E0',
+    headerBackground: '#1A1A1A',
+    headerBorder: '#4F4F4F',
+    buttonBackground: '#4F4F4F',
+    buttonHover: '#5A5A5A',
     disabledBackground: '#3A3A3A',
     disabledText: '#6A6A6A',
-    success: '#27AE60',
+    success: '#6AAA64', 
     error: '#EB5757',
-    warning: '#F2C94C',
+    warning: '#C9B458', 
     info: '#2F80ED',
     inputBackground: '#2A2A2A',
     cardBackground: '#2A2A2A',
     border: '#4F4F4F',
     tooltipBackground: 'rgba(255, 255, 255, 0.85)',
     tooltipText: '#1A1A1A',
+    correct: '#6AAA64',
+    semiCorrect: '#C9B458',
+    incorrect: '#787C7E',
   },
   fonts: {
     main: "'Inter', sans-serif",
